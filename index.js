@@ -29,7 +29,7 @@ app.post('/', async (req, res) => {
 
 async function printPDF(url) {
     const puppeteer = require('puppeteer');
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.goto(url, {waitUntil: 'networkidle0'});
     // await page.emulateMedia('screen');
