@@ -16,10 +16,15 @@ app.use(express.json());
 
 
 app.post('/', async (req, res) => {
-    console.log('URL: ', req.body.url);
-    const pdf = await printPDF(req.body.url);
-    res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
-    res.send(pdf);
+    console.log('REQUEST URL: ', req.body.url);
+    if (req.body.url) {
+      const pdf = await printPDF(req.body.url);
+      res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
+      res.send(pdf);
+    } else {
+      res.status(500).send();
+    }
+    
 })
 
 async function printPDF(url) {
