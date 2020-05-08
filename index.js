@@ -19,7 +19,7 @@ app.post('/', async (req, res) => {
   console.log('REQUEST URL: ', req.body.url);
   try {
     if (req.body.url) {
-      const pdf = await printPDF(req.body.url);
+      const pdf = await printPDF(req.body.url, req.body.name);
       res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
       res.send(pdf);
     } else {
@@ -32,14 +32,21 @@ app.post('/', async (req, res) => {
 
 })
 
-async function printPDF(url) {
+async function printPDF(url, name) {
   try {
     const puppeteer = require('puppeteer');
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle0' });
-    // await page.emulateMedia('screen');
-    const pdf = await page.pdf({ format: 'A4' });
+    await page.emulateMedia('screen');
+
+    const pdfConfig = {
+      path: `download-${name}.pdf`, // Saves pdf to disk. 
+      format: 'A4',
+      printBackground: true
+  };
+
+    const pdf = await page.pdf(pdfConfig);
 
     await browser.close();
     return pdf
