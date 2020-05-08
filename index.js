@@ -22,7 +22,7 @@ app.post('/', async (req, res) => {
   try {
     if (req.body.url) {
       const pdf = await printPDF(req.body.url, req.body.name);
-      res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
+      res.set({ 'Content-Type': 'application/pdf;charset=utf-8', 'Content-Length': pdf.length });
       res.send(pdf);
       // res.download(path.join(__dirname, req.body.name), function (err) {
       //   if (err) {
@@ -57,8 +57,6 @@ async function printPDF(url, name) {
     });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle0' });
-    await page.emulateMedia('screen');
-
     const pdfConfig = {
       format: 'A4',
       printBackground: true
