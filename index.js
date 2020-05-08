@@ -22,6 +22,16 @@ app.post('/', async (req, res) => {
       const pdf = await printPDF(req.body.url, req.body.name);
       res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
       res.send(pdf);
+
+      res.download(pdf, function (err) {
+        if (err) {
+            console.log("Error");
+            console.log(err);
+        } else {
+            console.log("Success");
+        }    
+ });
+
     } else {
       res.status(500).send();
     }
