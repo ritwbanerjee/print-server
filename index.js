@@ -19,7 +19,7 @@ app.post('/', async (req, res) => {
   console.log('REQUEST URL: ', req.body.url);
   try {
     if (req.body.url) {
-      const pdf = await printPDF(req.body.url, req.body.name);
+      const pdf = await printPDF(req.body.url);
       res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
       res.send(pdf);
 
@@ -40,7 +40,7 @@ app.post('/', async (req, res) => {
   }
 })
 
-async function printPDF(url, name) {
+async function printPDF(url) {
   try {
     const puppeteer = require('puppeteer');
     const browser = await puppeteer.launch({ headless: true });
