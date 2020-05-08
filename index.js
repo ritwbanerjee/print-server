@@ -28,8 +28,6 @@ app.post('/', async (req, res) => {
   } catch(err) {
     res.status(err);
   }
-  
-
 })
 
 async function printPDF(url, name) {
@@ -41,7 +39,6 @@ async function printPDF(url, name) {
     await page.emulateMedia('screen');
 
     const pdfConfig = {
-      path: `download-${name}.pdf`, // Saves pdf to disk. 
       format: 'A4',
       printBackground: true
   };
