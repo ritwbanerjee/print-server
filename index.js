@@ -7,6 +7,8 @@ const express = require('express'),
 require('dotenv').config();
 
 const app = express();
+const fs = require('fs');
+const path = require('path');
 
 app.use(compression());
 app.use(morgan('common'));
@@ -17,18 +19,24 @@ app.use(express.json());
 
 app.post('/', async (req, res) => {
   console.log('REQUEST URL: ', req.body.url);
+  console.log('FILE NAME: ', req.body.name);
   try {
     if (req.body.url) {
-      const pdf = await printPDF(req.body.url);
+      const pdf = await printPDF(req.body.url, req.body.name);
       res.set({ 'Content-Type': 'application/pdf', 'Content-Length': pdf.length });
-      res.send(pdf);
-
-      res.download(pdf, function (err) {
+      res.download(path.join(__dirname, req.body.name), function (err) {
         if (err) {
-            console.log("Error");
-            console.log(err);
+            console.log("Error downloading file: ", err);
         } else {
-            console.log("Success");
+            // DELETE THE FILE FROM THE FS
+            fs.unlink(path.join(__dirname, req.body.name), (err) => {
+              if (err) {
+                console.log('Error deleting file with name: ', req.body.name);
+              } else {
+                console.log('SUCCESSFULLY DELETED FILE FROM FS: ', path.join(__dirname, req.body.name));
+              }
+            });
+            console.log("DOWNLOAD SUCCESSFUL");
         }    
  });
 
@@ -40,21 +48,23 @@ app.post('/', async (req, res) => {
   }
 })
 
-async function printPDF(url) {
+async function printPDF(url, name) {
   try {
     const puppeteer = require('puppeteer');
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle0' });
     await page.emulateMedia('screen');
 
     const pdfConfig = {
+      path: `${name}`,
       format: 'A4',
       printBackground: true
   };
-
     const pdf = await page.pdf(pdfConfig);
-
     await browser.close();
     return pdf
   } catch (err) {
