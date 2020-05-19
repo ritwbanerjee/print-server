@@ -2,6 +2,7 @@
 module.exports = {
 
     createPDF: async function (res, url) {
+        console.log("REQUEST URL: ", url);
         try {
             const puppeteer = require('puppeteer');
             const browser = await puppeteer.launch({
@@ -10,7 +11,7 @@ module.exports = {
             });
             const page = await browser.newPage();
             await page.goto(url, { waitUntil: 'networkidle0' });
-    
+            await page.emulateMediaType('screen');
             const buffer = await page.pdf({
                 format: "A4",
                 printBackground: true,
